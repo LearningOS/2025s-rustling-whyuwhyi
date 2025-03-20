@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,16 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut idx = self.count;
+        let mut parent_idx = self.parent_idx(idx);
+
+        while idx > 1 && (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+            self.items.swap(idx, parent_idx);
+            idx = parent_idx;
+            parent_idx = self.parent_idx(idx);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +65,16 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        if self.right_child_idx(idx) <= self.count
+            && (self.comparator)(
+                &self.items[self.right_child_idx(idx)],
+                &self.items[self.left_child_idx(idx)],
+            )
+        {
+            self.right_child_idx(idx)
+        } else {
+            self.left_child_idx(idx)
+        }
     }
 }
 
@@ -84,8 +100,25 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            None
+        } else {
+            self.items.swap(1, self.count);
+            self.count -= 1;
+
+            let mut idx = 1;
+            let mut smallest_child_idx = self.smallest_child_idx(idx);
+
+            while smallest_child_idx <= self.count
+                && (self.comparator)(&self.items[smallest_child_idx], &self.items[idx])
+            {
+                self.items.swap(idx, smallest_child_idx);
+                idx = smallest_child_idx;
+                smallest_child_idx = self.smallest_child_idx(idx);
+            }
+
+            self.items.pop()
+        }
     }
 }
 
@@ -152,3 +185,4 @@ mod tests {
         assert_eq!(heap.next(), Some(2));
     }
 }
+
